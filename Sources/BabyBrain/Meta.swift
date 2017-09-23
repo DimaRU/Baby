@@ -3,7 +3,7 @@
  * @nixzhu (zhuhongxu@gmail.com)
  */
 
-public struct Meta {
+public struct Meta: Codable {
     let isPublic: Bool
     let modelType: String
     let codable: Bool
@@ -12,49 +12,38 @@ public struct Meta {
     let propertyMap: [String: String]
     let arrayObjectMap: [String: String]
     let propertyTypeMap: [String: String]
-    public struct EnumProperty {
+
+    public struct EnumProperty: Codable {
         public let name: String
-        public struct Case {
-            public let name: String
-            public let rawValue: String?
-
-            public init(name: String, rawValue: String?) {
-                self.name = name
-                self.rawValue = rawValue
-            }
-
-            public var string: String {
-                if let rawValue = rawValue {
-                    return "\(name): \(rawValue)"
-                } else {
-                    return name
-                }
-            }
-        }
-        public let cases: [Case]?
-
-        public init(name: String, cases: [(String, String?)]?) {
-            self.name = name
-            if let cases = cases {
-                self.cases = cases.map({ .init(name: $0, rawValue: $1) })
-            } else {
-                self.cases = nil
-            }
-        }
-
-        public var string: String {
-            var string = name
-            if let cases = cases, !cases.isEmpty {
-                string += "["
-                string += cases.map({ $0.string }).joined(separator: ", ")
-                string += "]"
-            }
-            return string
-        }
+        public let cases: [String: String?]
     }
-    let enumProperties: [EnumProperty]
+
+    let enumProperties: [EnumProperty]?
+    
+    enum CodingKeys: String, CodingKey {
+        case isPublic = "public"
+        case modelType = "model_type"
+        case codable
+        case declareVariableProperties = "declare_variable_properties"
+        case jsonDictionaryName = "json_dictionary_name"
+        case propertyMap = "property_map"
+        case arrayObjectMap = "array_map"
+        case propertyTypeMap = "property_type_map"
+        case enumProperties = "enum_property"
+    }
+
+    var removedKeySet: Set<String> {
+        var keySet: Set<String> = []
+        for (key, value) in propertyMap {
+            if value.isEmpty || value == "_" {
+                keySet.insert(key)
+            }
+        }
+        return keySet
+    }
 
     func contains(enumPropertyKey: String ) -> Bool {
+        guard let enumProperties = enumProperties else { return false }
         for enumProperty in enumProperties {
             if enumProperty.name == enumPropertyKey {
                 return true
@@ -63,7 +52,8 @@ public struct Meta {
         return false
     }
 
-    func enumCases(key: String) -> [EnumProperty.Case]? {
+    func enumCases(key: String) -> [String: String?]? {
+        guard let enumProperties = enumProperties else { return nil }
         for enumProperty in enumProperties {
             if enumProperty.name == key {
                 return enumProperty.cases
@@ -72,19 +62,7 @@ public struct Meta {
         return nil
     }
 
-    public init(isPublic: Bool, modelType: String, codable: Bool, declareVariableProperties: Bool, jsonDictionaryName: String, propertyMap: [String: String], arrayObjectMap: [String: String], propertyTypeMap: [String: String], enumProperties: [EnumProperty]) {
-        self.isPublic = isPublic
-        self.modelType = modelType
-        self.codable = codable
-        self.declareVariableProperties = declareVariableProperties
-        self.jsonDictionaryName = jsonDictionaryName
-        self.propertyMap = propertyMap
-        self.arrayObjectMap = arrayObjectMap
-        self.propertyTypeMap = propertyTypeMap
-        self.enumProperties = enumProperties
-    }
-
-    static var `default`: Meta {
+    public static var `default`: Meta {
         return Meta(
             isPublic: false,
             modelType: "struct",

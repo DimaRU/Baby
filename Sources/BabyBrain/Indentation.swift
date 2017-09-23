@@ -7,12 +7,7 @@ public struct Indentation {
     private let level: Int
     private let unit: String
 
-    public init(level: Int, unit: String) {
-        self.level = level
-        self.unit = unit
-    }
-
-    static var `default`: Indentation {
+    public static var `default`: Indentation {
         return Indentation(level: 0, unit: "    ")
     }
 

@@ -1,0 +1,26 @@
+{
+  "codable": true,
+  "public": true,
+  "model_type": "struct",
+  "declare_variable_properties": false,
+  "json_dictionary_name": "String",
+  "property_map": {
+    "from": "to",
+    "from1": "to1"
+  },
+  "property_type_map": {
+    "from": "to",
+    "from1": "to1"
+  },
+  "array_map": {
+    "from": "to",
+    "from1": "to1"
+  },
+  "enum_property": {
+    "name": "TestEnum",
+    "cases": {
+      "from": "to",
+      "from1": null
+    }
+  }
+}

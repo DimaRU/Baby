@@ -157,7 +157,8 @@ extension Value {
         }
     }
 
-    public func upgraded(newName: String, arrayObjectMap: [String: String], removedKeySet: Set<String>) -> Value {
+    public func upgraded(newName: String, meta: Meta) -> Value {
+//                         arrayObjectMap: [String: String], removedKeySet: Set<String>) -> Value {
         switch self {
         case let .number(value):
             switch value {
@@ -185,20 +186,20 @@ extension Value {
         case let .object(_, dictionary, keys):
             var newDictionary: [String: Value] = [:]
             dictionary.forEach {
-                if !removedKeySet.contains($0) {
-                    newDictionary[$0] = $1.upgraded(newName: $0, arrayObjectMap: arrayObjectMap, removedKeySet: removedKeySet)
+                if !meta.removedKeySet.contains($0) {
+                    newDictionary[$0] = $1.upgraded(newName: $0, meta: meta)
                 }
             }
             var newKeys: [String] = []
             for key in keys {
-                if !removedKeySet.contains(key) {
+                if !meta.removedKeySet.contains(key) {
                     newKeys.append(key)
                 }
             }
             return .object(name: newName, dictionary: newDictionary, keys: newKeys)
         case let .array(_, values):
             let newValues = values.map {
-                $0.upgraded(newName: newName.singularForm(arrayObjectMap: arrayObjectMap), arrayObjectMap: arrayObjectMap, removedKeySet: removedKeySet)
+                $0.upgraded(newName: newName.singularForm(arrayObjectMap: meta.arrayObjectMap), meta: meta)
             }
             let value = Value.mergedValue(of: newValues)
             return .array(name: newName, values: [value])

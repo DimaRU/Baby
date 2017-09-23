@@ -326,10 +326,8 @@ extension Value {
                         }
                     }
                     if let enumCases = meta.enumCases(key: key) {
-                        for enumCase in enumCases {
-                            let caseName = enumCase.name
-                            let caseRawValue = enumCase.rawValue ?? enumCase.name
-                            appendCase(name: caseName, rawValue: caseRawValue)
+                        for (name, rawValue) in enumCases {
+                            appendCase(name: name, rawValue: rawValue ?? name)
                         }
                     } else {
                         if !rawValues.isEmpty {
