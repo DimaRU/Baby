@@ -128,7 +128,15 @@ func main(_ arguments: [String]) {
             .appendingPathExtension("swift")
             .path
 
-        writeFileContent(path: outputPath, content: swiftCode!)
+        let header = """
+////
+///  \(name).swift
+//
+
+import Foundation
+\n
+"""
+        writeFileContent(path: outputPath, content: header + swiftCode!)
     }
     
 }
